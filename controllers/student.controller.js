@@ -103,3 +103,128 @@ exports.createStudent = async (req, res) => {
 
     }
 };
+
+// update 
+exports.updateStudent = async (req, res) => {
+
+    let connection;
+
+    try {
+
+        const sid = req.params.id;
+
+        const {
+            sname,
+            gender,
+            dob,
+            study_year,
+            academic_year,
+            semester,
+            class_id
+        } = req.body;
+
+        connection = await connectDB();
+
+        const result = await connection.execute(
+            `UPDATE STUDENT
+             SET
+                SNAME = :sname,
+                GENDER = :gender,
+                DOB = TO_DATE(:dob,'YYYY-MM-DD'),
+                STUDY_YEAR = :study_year,
+                ACADEMIC_YEAR = :academic_year,
+                SEMESTER = :semester,
+                CLASS_ID = :class_id
+             WHERE SID = :sid`,
+            {
+                sid,
+                sname,
+                gender,
+                dob,
+                study_year,
+                academic_year,
+                semester,
+                class_id
+            },
+            { autoCommit: true }
+        );
+
+        if (result.rowsAffected === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "Student not found."
+            });
+        }
+
+        res.json({
+            success: true,
+            message: "Student updated successfully."
+        });
+
+    } catch (err) {
+
+        console.error(err);
+
+        res.status(500).json({
+            success: false,
+            message: err.message
+        });
+
+    } finally {
+
+        if (connection) {
+            await connection.close();
+        }
+
+    }
+
+};
+
+
+// delete 
+exports.deleteStudent = async (req, res) => {
+
+    let connection;
+
+    try {
+
+        const sid = req.params.id;
+
+        connection = await connectDB();
+
+        const result = await connection.execute(
+            `DELETE FROM STUDENT
+                WHERE SID = :sid`,
+            { sid },
+            { autoCommit: true }
+        );
+
+        if (result.rowsAffected === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "Student not found."
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Student deleted successfully."
+        });
+
+    } catch (err) {
+
+        console.error(err);
+
+        res.status(500).json({
+            success: false,
+            message: err.message
+        });
+
+    } finally {
+
+        if (connection) {
+            await connection.close();
+        }
+
+    }
+};

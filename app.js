@@ -2,7 +2,8 @@ const express = require("express");
 const cors = require("cors");
 
 const connectDB = require("./config/database");
-const studentRoute = require("./routes/student.route");
+const studentRoute = require("./routes/student.route")
+const reportRoute = require("./routes/report.route");;
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.get("/", async (req, res) => {
 });
 
 app.use("/students", studentRoute);
+app.use("/report", reportRoute);
 
 const PORT = 3000;
 
